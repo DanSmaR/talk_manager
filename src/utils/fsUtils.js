@@ -10,12 +10,22 @@ function getMaxId(talkerList) {
 }
 
 async function getAllTalkers() {
-  return JSON.parse(await fs.readFile(PATH_TALKER_LIST, 'utf-8'));
+  try {
+    return JSON.parse(await fs.readFile(PATH_TALKER_LIST, 'utf-8'));
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 
 async function getTalkerById(talkerId) {
-  const talkersList = await getAllTalkers();
-  return talkersList.find(({ id }) => id === talkerId);
+  try {
+    const talkersList = await getAllTalkers();
+    return talkersList.find(({ id }) => id === talkerId);
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 
 async function saveToken(token) {
@@ -23,20 +33,45 @@ async function saveToken(token) {
 }
 
 async function getToken() {
-  return fs.readFile(PATH_TOKEN, 'utf-8');
+  try {
+    return await fs.readFile(PATH_TOKEN, 'utf-8');
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 
 async function addNewTalker(newTalker) {
-  const prevTalkerList = await getAllTalkers();
-  const newTalkerWithId = {
-    name: newTalker.name,
-    age: newTalker.age,
-    id: getMaxId(prevTalkerList),
-    talk: newTalker.talk,
-  };
-  const newTalkerList = JSON.stringify([...prevTalkerList, newTalkerWithId], null, 2);
-  await fs.writeFile(PATH_TALKER_LIST, newTalkerList);
-  return newTalkerWithId;
+  try {
+    const prevTalkersList = await getAllTalkers();
+    const newTalkerWithId = {
+      name: newTalker.name,
+      age: newTalker.age,
+      id: getMaxId(prevTalkersList),
+      talk: newTalker.talk,
+    };
+    const newTalkerList = JSON.stringify([...prevTalkersList, newTalkerWithId], null, 2);
+    await fs.writeFile(PATH_TALKER_LIST, newTalkerList);
+    return newTalkerWithId;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
+async function updateTalker(id, newTalkerData) {
+  try {
+    const prevTalkersList = await getAllTalkers();
+    const updatedTalkersList = prevTalkersList.map((talker) => {
+      if (talker.id === id) return { ...talker, ...newTalkerData };
+      return talker;
+    });
+    await fs.writeFile(PATH_TALKER_LIST, JSON.stringify(updatedTalkersList, null, 2));
+    return { id, ...newTalkerData };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 
 module.exports = {
@@ -45,4 +80,5 @@ module.exports = {
   saveToken,
   getToken,
   addNewTalker,
+  updateTalker,
 };
