@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const { getAllTalkers, getTalkerById, getToken } = require('../utils/fsUtils');
+const { getAllTalkers, getTalkerById, getToken, addNewTalker } = require('../utils/fsUtils');
 
 const router = express.Router();
 
@@ -76,7 +76,8 @@ router.post('/', async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-  res.status(201).json('ok');
+  const newTalker = await addNewTalker(req.body);
+  res.status(201).json(newTalker);
 });
 
 module.exports = router;
