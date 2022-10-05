@@ -86,6 +86,17 @@ async function deleteTalker(id) {
   }
 }
 
+async function searchTalker(query) {
+  try {
+    const prevTalkersList = await getAllTalkers();
+    if (!query) return prevTalkersList;
+    return prevTalkersList.filter((talker) => talker.name.includes(query));
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 module.exports = {
   getAllTalkers,
   getTalkerById,
@@ -94,4 +105,5 @@ module.exports = {
   addNewTalker,
   updateTalker,
   deleteTalker,
+  searchTalker,
 };

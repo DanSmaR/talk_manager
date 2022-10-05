@@ -1,9 +1,18 @@
 const express = require('express');
-const { getAllTalkers, addNewTalker, updateTalker, deleteTalker } = require('../utils/fsUtils');
+const { getAllTalkers, addNewTalker, updateTalker, deleteTalker, searchTalker } = require('../utils/fsUtils');
 const { validateNewTalker, checkHasTalker } = require('../middlewares/validateTalker');
 const validateToken = require('../middlewares/validateToken');
 
 const router = express.Router();
+
+router.get('/search', validateToken, async (req, res) => {
+  const { q } = req.query;
+  const filteredTalkersList = await searchTalker(q);
+  if (filteredTalkersList === null) {
+    return res.status(500).json({ message: 'Talkers not found in database' }); 
+  }
+  res.status(200).json(filteredTalkersList);
+});
 
 router.get('/', async (_req, res) => {
   const talkers = await getAllTalkers();
