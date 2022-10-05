@@ -74,6 +74,18 @@ async function updateTalker(id, newTalkerData) {
   }
 }
 
+async function deleteTalker(id) {
+  try {
+    const prevTalkersList = await getAllTalkers();
+    const updatedTalkersList = prevTalkersList.filter((talker) => talker.id !== id);
+    await fs.writeFile(PATH_TALKER_LIST, JSON.stringify(updatedTalkersList, null, 2));
+    return true;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 module.exports = {
   getAllTalkers,
   getTalkerById,
@@ -81,4 +93,5 @@ module.exports = {
   getToken,
   addNewTalker,
   updateTalker,
+  deleteTalker,
 };

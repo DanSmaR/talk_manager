@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllTalkers, addNewTalker, updateTalker } = require('../utils/fsUtils');
+const { getAllTalkers, addNewTalker, updateTalker, deleteTalker } = require('../utils/fsUtils');
 const { validateNewTalker, checkHasTalker } = require('../middlewares/validateTalker');
 const validateToken = require('../middlewares/validateToken');
 
@@ -13,6 +13,13 @@ router.get('/', async (_req, res) => {
 
 router.get('/:talkerId', checkHasTalker, async (req, res) => {
   res.status(200).json(req.talker);
+});
+
+router.delete('/:talkerId', validateToken, checkHasTalker, async (req, res) => {
+  const { talkerId } = req.params;
+  const isTalkerDeleted = await deleteTalker(Number(talkerId));
+  if (!isTalkerDeleted) return res.status(500).json({ message: 'talker not deleted' });
+  res.status(204).end();
 });
 
 router.use(validateToken, validateNewTalker);
