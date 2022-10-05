@@ -1,6 +1,6 @@
-const { getAllTalkers, addNewTalker, updateTalker, deleteTalker, searchTalker } = require('../utils/fsUtils');
-const { validateNewTalker, checkHasTalker } = require('../middlewares/validateTalker');
-const validateToken = require('../middlewares/validateToken');
+const {
+  getAllTalkers, addNewTalker, updateTalker, deleteTalker, searchTalker,
+} = require('../utils/fsUtils');
 
 async function getTalkers(_req, res) {
   const talkers = await getAllTalkers();
