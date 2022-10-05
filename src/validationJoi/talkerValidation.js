@@ -1,23 +1,13 @@
 const Joi = require('joi');
 
 const errMsgTalker = {
-  name: {
-    'string.min': 'O "name" deve ter pelo menos 3 caracteres',
-    'any.required': 'O campo "name" é obrigatório',
-  },
   age: {
     'number.min': 'A pessoa palestrante deve ser maior de idade',
-    'any.required': 'O campo "age" é obrigatório',
-  },
-  talk: {
-    'any.required': 'O campo "talk" é obrigatório',
   },
   watchedAt: {
-    'any.required': 'O campo "watchedAt" é obrigatório',
     'string.pattern.base': 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"',
   },
   rate: {
-    'any.required': 'O campo "rate" é obrigatório',
     'number.min': 'O campo "rate" deve ser um inteiro de 1 à 5',
     'number.max': 'O campo "rate" deve ser um inteiro de 1 à 5',
   },
@@ -25,16 +15,20 @@ const errMsgTalker = {
 
 const talkObjKeySchema = Joi.object().keys({
   watchedAt: Joi.string().pattern(/[0-9]{2}[/]{1}[0-9]{2}[/]{1}[0-9]{4}/).required()
+    .label('watchedAt')
     .messages(errMsgTalker.watchedAt),
   rate: Joi.number().integer().min(1).max(5)
     .required()
+    .label('rate')
     .messages(errMsgTalker.rate),
 });
 const schema = Joi.object().keys({
-  name: Joi.string().trim().min(3).required()
-    .messages(errMsgTalker.name),
+  name: Joi.string().trim().min(3).required(),
   age: Joi.number().min(18).required().messages(errMsgTalker.age),
-  talk: talkObjKeySchema.required().messages(errMsgTalker.talk),
+  talk: talkObjKeySchema.required(),
+}).messages({
+  'any.required': 'O campo {{#label}} é obrigatório',
+  'string.min': 'O {{#label}} deve ter pelo menos {{#limit}} caracteres',
 });
 
 module.exports = schema;
