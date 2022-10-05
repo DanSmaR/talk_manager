@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const Joi = require('joi');
+const { saveToken } = require('../utils/fsUtils');
 
 const router = express.Router();
 
@@ -25,22 +26,23 @@ function convertErrorMessage(errorMessage) {
   }
 }
 
-router.post('/', (req, res) => {
-  const token = crypto.randomBytes(8).toString('hex');
+function validateUserLogin(userDataObj) {
   const schema = Joi.object().keys({
-    email: Joi.string().trim().email()
-            .required(),
+    email: Joi.string().trim().email().required(),
     password: Joi.string().min(6).required(),
   });
+  const { error } = schema.validate(userDataObj);
+  return error;
+}
 
-  const { error } = schema.validate(req.body);
-
+router.post('/', async (req, res) => {
+  const token = crypto.randomBytes(8).toString('hex');
+  const error = validateUserLogin(req.body);
   if (error) {
-    console.log(error.message);
     const message = convertErrorMessage(error.message);
-    console.log(message);
     return res.status(400).json({ message });
   }
+  await saveToken(token);
   res.status(200).json({ token });
 });
 
